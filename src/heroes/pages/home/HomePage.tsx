@@ -7,11 +7,21 @@ import { HeroStats } from '@/heroes/components/HeroStats';
 import { HeroGrid } from '@/heroes/components/HeroGrid';
 import { CustomPagination } from '@/components/custom/CustomPagination';
 import { CustomBreadcrumbs } from '@/components/custom/CustomBreadcrumbs';
+// import { getHeroesByPage } from '@/heroes/actions/get-heroes-by-page.action';
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState<
     'all' | 'favorites' | 'heroes' | 'villains'
   >('all');
+
+
+  /* IMPORTANT: This approach is not recommended, because it fetches data on every render */
+  // useEffect(() => {
+  //   getHeroesByPage().then((heroes) => {
+  //     console.log({ heroes });
+  //   });
+  // }, []);
+
   return (
     <>
       <>
@@ -20,7 +30,6 @@ export const HomePage = () => {
           title='Superhero Universe'
           description='Discover, explore, and manage your favorite superheroes and villains'
         />
-
 
         <CustomBreadcrumbs currentPage='Super heroes' />
 
@@ -78,7 +87,7 @@ export const HomePage = () => {
         {/* Character Grid */}
 
         {/* Pagination */}
-        <CustomPagination totalPages={8}/>
+        <CustomPagination totalPages={8} />
       </>
     </>
   );
