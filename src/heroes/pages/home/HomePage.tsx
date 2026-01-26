@@ -7,20 +7,25 @@ import { HeroStats } from '@/heroes/components/HeroStats';
 import { HeroGrid } from '@/heroes/components/HeroGrid';
 import { CustomPagination } from '@/components/custom/CustomPagination';
 import { CustomBreadcrumbs } from '@/components/custom/CustomBreadcrumbs';
-// import { getHeroesByPage } from '@/heroes/actions/get-heroes-by-page.action';
+import { getHeroesByPageAction } from '@/heroes/actions/get-heroes-by-page.action';
+import { useQuery } from '@tanstack/react-query';
 
 export const HomePage = () => {
   const [activeTab, setActiveTab] = useState<
     'all' | 'favorites' | 'heroes' | 'villains'
   >('all');
 
-
   /* IMPORTANT: This approach is not recommended, because it fetches data on every render */
   // useEffect(() => {
-  //   getHeroesByPage().then((heroes) => {
-  //     console.log({ heroes });
-  //   });
+  //   getHeroesByPage().then(() => {});
   // }, []);
+
+  // Is better to use TanStack Query to handle data fetching
+  const { data } = useQuery({
+    queryKey: ['heroes'],
+    queryFn: () => getHeroesByPageAction(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   return (
     <>
