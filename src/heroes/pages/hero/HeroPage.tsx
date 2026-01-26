@@ -1,6 +1,12 @@
+import { useParams } from 'react-router';
 
 export const HeroPage = () => {
-  return (
-    <div>HeroPage</div>
-  )
-}
+
+  const { idSlug = '' } = useParams();
+
+  console.log({ idSlug });
+
+
+
+  return <div>HeroPage</div>;
+};
