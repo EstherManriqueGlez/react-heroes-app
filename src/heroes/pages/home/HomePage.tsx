@@ -30,7 +30,7 @@ export const HomePage = () => {
 
   // Is better to use TanStack Query to handle data fetching
   const { data: heroesResponse } = useQuery({
-    queryKey: ['heroes'],
+    queryKey: ['heroes', { page, limit }],
     queryFn: () => getHeroesByPageAction(+page, +limit),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -126,7 +126,7 @@ export const HomePage = () => {
         {/* Character Grid */}
 
         {/* Pagination */}
-        <CustomPagination totalPages={8} />
+        <CustomPagination totalPages={heroesResponse?.pages ?? 1} />
       </>
     </>
   );
