@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomJumbotron } from '@/components/custom/CustomJumbotron';
@@ -8,8 +7,8 @@ import { HeroStats } from '@/heroes/components/HeroStats';
 import { HeroGrid } from '@/heroes/components/HeroGrid';
 import { CustomPagination } from '@/components/custom/CustomPagination';
 import { CustomBreadcrumbs } from '@/components/custom/CustomBreadcrumbs';
-import { getHeroesByPageAction } from '@/heroes/actions/get-heroes-by-page.action';
-import { getSummaryAction } from '@/heroes/actions/get-summary.action';
+import { useHeroSummary } from '@/heroes/hooks/useHeroSummary';
+import { useHeroPagination } from '@/heroes/hooks/useHeroPagination';
 
 export const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,23 +23,9 @@ export const HomePage = () => {
     return validTabs.includes(activeTab) ? activeTab : 'all';
   }, [activeTab]);
 
-  /* IMPORTANT: This approach is not recommended, because it fetches data on every render */
-  // useEffect(() => {
-  //   getHeroesByPage().then(() => {});
-  // }, []);
 
-  // Is better to use TanStack Query to handle data fetching
-  const { data: heroesResponse } = useQuery({
-    queryKey: ['heroes', { page, limit }],
-    queryFn: () => getHeroesByPageAction(+page, +limit),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-
-  const {data: summary} = useQuery({
-      queryKey: ['summary-information'],
-      queryFn: getSummaryAction,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    });
+  const { data: heroesResponse } = useHeroPagination(+page, +limit);
+  const { data: summary } = useHeroSummary();
 
   return (
     <>
