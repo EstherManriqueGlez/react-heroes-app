@@ -1,13 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { getHeroesByPageAction } from "../actions/get-heroes-by-page.action";
+import { useQuery } from '@tanstack/react-query';
+import { getHeroesByPageAction } from '../actions/get-heroes-by-page.action';
 
-
-
-export const useHeroPagination = (page: number, limit: number) => {
-
-  return    useQuery({
-    queryKey: ['heroes', { page, limit }],
-    queryFn: () => getHeroesByPageAction(+page, +limit),
+export const useHeroPagination = (
+  page: number,
+  limit: number,
+  category: string = 'all',
+) => {
+  return useQuery({
+    queryKey: ['heroes', { page, limit, category }],
+    queryFn: () => getHeroesByPageAction(+page, +limit, category),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
-}
+};
