@@ -12,8 +12,8 @@ export const SearchPage = () => {
   // TODO: Fetch and display heroes based on search criteria with useQuery
   const [searchParams] = useSearchParams();
 
-  const name = searchParams.get('name') ?? '';
-  const strength = Number(searchParams.get('strength') ?? '0');
+  const name = searchParams.get('name') ?? undefined;
+  const strength = Number(searchParams.get('strength') ?? undefined);
 
   const { data: heroes = [] } = useQuery({
     queryKey: [
