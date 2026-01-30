@@ -14,7 +14,7 @@ import { FavoriteHeroContext } from '@/heroes/context/FavoriteHeroContext';
 export const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const {favoriteCount, favorites} =use(FavoriteHeroContext)
+  const { favoriteCount, favorites } = use(FavoriteHeroContext);
 
   const activeTab = searchParams.get('tab') ?? 'all';
   const page = searchParams.get('page') ?? '1';
@@ -26,7 +26,6 @@ export const HomePage = () => {
 
     return validTabs.includes(activeTab) ? activeTab : 'all';
   }, [activeTab]);
-
 
   const { data: heroesResponse } = useHeroPagination(+page, +limit, category);
   const { data: summary } = useHeroSummary();
