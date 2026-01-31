@@ -65,7 +65,7 @@ export const SearchControls = () => {
                 //   return prev;
                 // });
                 return;
-              } 
+              }
               setQueryParam('active-accordion', 'advanced-filters');
             }}
           >
@@ -91,7 +91,7 @@ export const SearchControls = () => {
 
       {/* Advanced Filters */}
 
-      <Accordion type='single' collapsible value={activeAccordion}>
+      <Accordion type='single' collapsible value={activeAccordion} data-testid='accordion'>
         <AccordionItem value='advanced-filters'>
           {/* <AccordionTrigger>Advanced Filters</AccordionTrigger> */}
           <AccordionContent>
@@ -130,11 +130,14 @@ export const SearchControls = () => {
                 <label className='text-sm font-medium mb-2 block'>
                   Minimum Strength: {selectedStrength}/10
                 </label>
-                <Slider 
-                defaultValue={[selectedStrength]} 
-                onValueChange={ (value) => setQueryParam('strength', value[0].toString())}
-                max={10} 
-                step={1} />
+                <Slider
+                  defaultValue={[selectedStrength]}
+                  onValueChange={(value) =>
+                    setQueryParam('strength', value[0].toString())
+                  }
+                  max={10}
+                  step={1}
+                />
               </div>
             </div>
           </AccordionContent>
