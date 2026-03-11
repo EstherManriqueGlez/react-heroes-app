@@ -15,7 +15,7 @@ export const CustomMenu = () => {
   };
 
   return (
-    <NavigationMenu className='py-5'>
+    <NavigationMenu className="py-5">
       <NavigationMenuList>
         {/* Home */}
         <NavigationMenuItem>
@@ -23,7 +23,7 @@ export const CustomMenu = () => {
             asChild
             className={cn(isActive('/') && 'bg-slate-300 ', 'p-3 rounded-md')}
           >
-            <Link to='/'>Home</Link>
+            <Link to="/">Home</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
@@ -31,9 +31,12 @@ export const CustomMenu = () => {
         <NavigationMenuItem>
           <NavigationMenuLink
             asChild
-            className={cn(isActive('/search') && 'bg-slate-300 ', 'p-3 rounded-md')}
+            className={cn(
+              isActive('/search') && 'bg-slate-300 ',
+              'p-3 rounded-md',
+            )}
           >
-            <Link to='/search'>Search</Link>
+            <Link to="/search">Search</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

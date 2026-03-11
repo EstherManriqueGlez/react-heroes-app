@@ -35,20 +35,20 @@ export const HomePage = () => {
       <>
         {/* Header */}
         <CustomJumbotron
-          title='Superhero Universe'
-          description='Discover, explore, and manage your favorite superheroes and villains'
+          title="Superhero Universe"
+          description="Discover, explore, and manage your favorite superheroes and villains"
         />
 
-        <CustomBreadcrumbs currentPage='Super heroes' />
+        <CustomBreadcrumbs currentPage="Super heroes" />
 
         {/* Stats Dashboard */}
         <HeroStats />
 
         {/* Tabs */}
-        <Tabs value={selectedTab} className='mb-8'>
-          <TabsList className='grid w-full grid-cols-4'>
+        <Tabs value={selectedTab} className="mb-8">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger
-              value='all'
+              value="all"
               onClick={() =>
                 setSearchParams((prev) => {
                   prev.set('tab', 'all');
@@ -61,8 +61,8 @@ export const HomePage = () => {
               All Characters ({summary?.totalHeroes ?? 0})
             </TabsTrigger>
             <TabsTrigger
-              value='favorites'
-              className='flex items-center gap-2'
+              value="favorites"
+              className="flex items-center gap-2"
               onClick={() =>
                 setSearchParams((prev) => {
                   prev.set('tab', 'favorites');
@@ -73,7 +73,7 @@ export const HomePage = () => {
               Favorites ({favoriteCount})
             </TabsTrigger>
             <TabsTrigger
-              value='heroes'
+              value="heroes"
               onClick={() =>
                 setSearchParams((prev) => {
                   prev.set('tab', 'heroes');
@@ -86,7 +86,7 @@ export const HomePage = () => {
               Heroes ({summary?.heroCount ?? 0})
             </TabsTrigger>
             <TabsTrigger
-              value='villains'
+              value="villains"
               onClick={() =>
                 setSearchParams((prev) => {
                   prev.set('tab', 'villains');
@@ -100,26 +100,24 @@ export const HomePage = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value='all'>
+          <TabsContent value="all">
             {/* Show All Characters */}
             <HeroGrid heroes={heroesResponse?.heroes ?? []} />
           </TabsContent>
 
-          <TabsContent value='favorites'>
+          <TabsContent value="favorites">
             {/* Show Favorite Characters */}
-            {/* <h1>Favorites</h1> */}
             <HeroGrid heroes={favorites} />
           </TabsContent>
 
-          <TabsContent value='heroes'>
+          <TabsContent value="heroes">
             {/* Show Heroes */}
             <h1>Heroes</h1>
             <HeroGrid heroes={heroesResponse?.heroes ?? []} />
           </TabsContent>
 
-          <TabsContent value='villains'>
+          <TabsContent value="villains">
             {/* Show Villains */}
-            <h1>Villains</h1>
             <HeroGrid heroes={heroesResponse?.heroes ?? []} />
           </TabsContent>
         </Tabs>
