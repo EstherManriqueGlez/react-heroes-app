@@ -112,7 +112,6 @@ export const HomePage = () => {
 
           <TabsContent value="heroes">
             {/* Show Heroes */}
-            <h1>Heroes</h1>
             <HeroGrid heroes={heroesResponse?.heroes ?? []} />
           </TabsContent>
 
