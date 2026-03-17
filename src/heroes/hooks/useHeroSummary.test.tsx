@@ -1,7 +1,7 @@
+import { type PropsWithChildren } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type PropsWithChildren } from 'react';
 import { useHeroSummary } from './useHeroSummary';
 import { getSummaryAction } from '../actions/get-summary.action';
 import type { SummaryInformationResponse } from '../types/summary-information.response';
@@ -67,7 +67,6 @@ describe('useHeroSummary', () => {
   });
 
   test('should return error state when API call fails', async () => {
-
     const mockError = new Error('Failed to fetch summary data');
     mockedGetSummaryAction.mockRejectedValue(mockError);
 
@@ -75,13 +74,12 @@ describe('useHeroSummary', () => {
       wrapper: tanStackCustomProvider(),
     });
 
-
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isSuccess).toBe(false);
     expect(result.current.error).toBe(mockError);
-
-
+    expect(mockedGetSummaryAction).toHaveBeenCalled();
+    expect(result.current.error?.message).toBe('Failed to fetch summary data');
   });
 });
