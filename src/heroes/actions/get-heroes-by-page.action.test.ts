@@ -81,7 +81,6 @@ describe('getHeroesByPageAction', () => {
   });
 
   test('should call the api with correct params', async () => {
-
     const responseObject = {
       total: 10,
       pages: 1,
@@ -100,6 +99,5 @@ describe('getHeroesByPageAction', () => {
       offset: 18,
       category: 'heroes',
     });
-
   });
 });
