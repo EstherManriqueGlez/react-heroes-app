@@ -1,5 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { useHeroPagination } from './useHeroPagination';
@@ -25,12 +25,10 @@ const tanStackCustomProvider = () => {
 };
 
 describe('useHeroPagination', () => {
-
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient.clear();
   });
-
 
   test('should return the initial state (isLoading)', () => {
     const { result } = renderHook(() => useHeroPagination(1, 6), {
