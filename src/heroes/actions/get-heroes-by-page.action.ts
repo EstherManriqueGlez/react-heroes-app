@@ -8,11 +8,11 @@ export const getHeroesByPageAction = async (
   limit: number = 6,
   category: string = 'all',
 ): Promise<HeroesResponse> => {
-  if(isNaN(page) || page < 1) {
+  if (isNaN(page) || page < 1) {
     page = 1;
   }
 
-  if(isNaN(limit) || limit < 1) {
+  if (isNaN(limit) || limit < 1) {
     limit = 6;
   }
 
