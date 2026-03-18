@@ -18,7 +18,7 @@ const mockLocalStorage = {
   getItem: vi.fn(),
   setItem: vi.fn(),
   clear: vi.fn(),
-}
+};
 
 Object.defineProperty(window, 'localStorage', {
   value: mockLocalStorage,
@@ -30,8 +30,8 @@ const TestComponent = () => {
 
   return (
     <div>
-      <div data-testid='favorite-count'>{favoriteCount}</div>
-      <div data-testid='favorites-list'>
+      <div data-testid="favorite-count">{favoriteCount}</div>
+      <div data-testid="favorites-list">
         {favorites.map((hero) => (
           <div key={hero.id} data-testid={`favorite-hero-${hero.id}`}>
             {hero.name}
@@ -39,12 +39,12 @@ const TestComponent = () => {
         ))}
       </div>
       <button
-        data-testid='toggle-favorite'
+        data-testid="toggle-favorite"
         onClick={() => toggleFavorite(mockHero)}
       >
         Toggle Favorite
       </button>
-      <div data-testid='is-favorite'>{isFavorite(mockHero).toString()}</div>
+      <div data-testid="is-favorite">{isFavorite(mockHero).toString()}</div>
     </div>
   );
 };
@@ -61,12 +61,10 @@ describe('FavoriteHeroContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  
+
   test('should initialize with default values', () => {
-
     renderContextTestComponent();
-    screen.debug();
-
+    // screen.debug();
 
     expect(screen.getByTestId('favorite-count').textContent).toBe('0');
     expect(screen.getByTestId('favorites-list').children.length).toBe(0);
@@ -111,6 +109,5 @@ describe('FavoriteHeroContext', () => {
       'favoriteHeroes',
       '[]',
     );
-
   });
 });
