@@ -10,31 +10,31 @@ vi.mock('../hooks/useHeroSummary');
 const mockedUseHeroSummary = vi.mocked(useHeroSummary);
 
 const mockHero = {
-    id: '1',
-    name: 'Clark Kent',
-    slug: 'clark-kent',
-    alias: 'Superman',
-    powers: [
-      'Súper fuerza',
-      'Vuelo',
-      'Visión de calor',
-      'Visión de rayos X',
-      'Invulnerabilidad',
-      'Súper velocidad',
-    ],
-    description:
-      'El Último Hijo de Krypton, protector de la Tierra y símbolo de esperanza para toda la humanidad.',
-    strength: 10,
-    intelligence: 8,
-    speed: 9,
-    durability: 10,
-    team: 'Liga de la Justicia',
-    image: '1.jpeg',
-    firstAppearance: '1938',
-    status: 'Active',
-    category: 'Hero',
-    universe: 'DC',
-  };
+  id: '1',
+  name: 'Clark Kent',
+  slug: 'clark-kent',
+  alias: 'Superman',
+  powers: [
+    'Súper fuerza',
+    'Vuelo',
+    'Visión de calor',
+    'Visión de rayos X',
+    'Invulnerabilidad',
+    'Súper velocidad',
+  ],
+  description:
+    'El Último Hijo de Krypton, protector de la Tierra y símbolo de esperanza para toda la humanidad.',
+  strength: 10,
+  intelligence: 8,
+  speed: 9,
+  durability: 10,
+  team: 'Liga de la Justicia',
+  image: '1.jpeg',
+  firstAppearance: '1938',
+  status: 'Active',
+  category: 'Hero',
+  universe: 'DC',
+};
 
 const mockSummaryData: SummaryInformationResponse = {
   totalHeroes: 25,
@@ -132,28 +132,23 @@ describe('HeroStats', () => {
   test('should render HeroStats with mock data', () => {
     const { container } = renderHeroStats(mockSummaryData);
 
-    
     expect(container).toMatchSnapshot();
     expect(screen.getByText('Total Characters')).toBeDefined();
     expect(screen.getByText('25')).toBeDefined();
     expect(screen.getByText('18 Heroes')).toBeDefined();
     expect(screen.getByText('7 Villains')).toBeDefined();
   });
-  
+
   test('should change the percent of favorites when a hero is added to favorites', () => {
     localStorage.setItem('favoriteHeroes', JSON.stringify([mockHero]));
-    
-     renderHeroStats(mockSummaryData);
-    
-     
-     const favoritePercentageElement = screen.getByTestId('percent-favorites');
-     expect(favoritePercentageElement.textContent).toBe('4.00% of total');
-     
-     
-     const favoriteCountElement = screen.getByTestId('favorite-count');
+
+    renderHeroStats(mockSummaryData);
+
+    const favoritePercentageElement = screen.getByTestId('percent-favorites');
+    expect(favoritePercentageElement.textContent).toBe('4.00% of total');
+
+    const favoriteCountElement = screen.getByTestId('favorite-count');
     //  screen.debug(favoriteCountElement);
     expect(favoriteCountElement.textContent).toBe('1');
-
-
   });
 });
