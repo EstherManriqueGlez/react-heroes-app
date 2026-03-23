@@ -11,8 +11,6 @@ import { HomePage } from '@/heroes/pages/home/HomePage';
 
 const SearchPage = lazy(() => import('@/heroes/pages/search/SearchPage'));
 
-
-
 // export const appRouter = createBrowserRouter([
 export const appRouter = createHashRouter([
   {
@@ -35,7 +33,7 @@ export const appRouter = createHashRouter([
         path: '*',
         // element: <h1>404 - Not Found</h1>
         element: <Navigate to="/" />,
-      }
+      },
     ],
   },
 
