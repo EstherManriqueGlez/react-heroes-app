@@ -10,26 +10,26 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@/heroes/layouts/HeroesLayout', () => ({
   HeroesLayout: () => (
-    <div data-testid='heroes-layout'>
+    <div data-testid="heroes-layout">
       <Outlet />
     </div>
   ),
 }));
 
 vi.mock('@/heroes/pages/home/HomePage', () => ({
-  HomePage: () => <div data-testid='home-page'>Mocked Home Page</div>,
+  HomePage: () => <div data-testid="home-page">Mocked Home Page</div>,
 }));
 
 vi.mock('@/heroes/pages/hero/HeroPage', () => ({
   HeroPage: () => {
     const { idSlug = '' } = useParams();
 
-    return <div data-testid='hero-page'>HeroPage - {idSlug}</div>;
+    return <div data-testid="hero-page">HeroPage - {idSlug}</div>;
   },
 }));
 
 vi.mock('@/heroes/pages/search/SearchPage', () => ({
-  default: () => <div data-testid='search-page'>Mocked Search Page</div>,
+  default: () => <div data-testid="search-page">Mocked Search Page</div>,
 }));
 
 describe('appRouter', () => {
