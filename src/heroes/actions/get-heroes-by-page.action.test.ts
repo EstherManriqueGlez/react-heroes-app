@@ -32,8 +32,8 @@ describe('getHeroesByPageAction', () => {
       total: 10,
       pages: 2,
       heroes: [
-        { image: `${BASE_URL}/Images/hero1.jpg` },
-        { image: `${BASE_URL}/Images/hero2.jpg` },
+        { image: `${BASE_URL}/images/hero1.jpg` },
+        { image: `${BASE_URL}/images/hero2.jpg` },
       ],
     });
   });
