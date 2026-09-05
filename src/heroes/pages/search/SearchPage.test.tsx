@@ -4,10 +4,20 @@ import { SearchPage } from './SearchPage';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { searchHeroesAction } from '@/heroes/actions/search-heroes.actions';
+import { useHeroCatalog } from '@/heroes/hooks/useHeroCatalog';
 import type { Hero } from '@/heroes/types/hero.interface';
 
 vi.mock('@/heroes/actions/search-heroes.actions');
 const mockedSearchHeroesAction = vi.mocked(searchHeroesAction);
+
+mockedSearchHeroesAction.mockResolvedValue([]);
+
+vi.mock('@/heroes/hooks/useHeroCatalog');
+const mockedUseHeroCatalog = vi.mocked(useHeroCatalog);
+
+mockedUseHeroCatalog.mockReturnValue({
+  data: { total: 0, pages: 1, heroes: [] },
+} as unknown as ReturnType<typeof useHeroCatalog>);
 
 vi.mock('@/components/custom/CustomJumbotron', () => ({
   CustomJumbotron: () => <div data-testid='custom-jumbotron-mock'></div>,
@@ -15,7 +25,6 @@ vi.mock('@/components/custom/CustomJumbotron', () => ({
 
 vi.mock('./ui/SearchControls', () => ({
   SearchControls: () => <div data-testid='search-controls-mock'></div>,
-  // HeroGrid: () => <div data-testid='hero-grid-mock'></div>,
 }));
 
 vi.mock('@/heroes/components/HeroGrid', () => ({
@@ -28,15 +37,16 @@ vi.mock('@/heroes/components/HeroGrid', () => ({
   ),
 }));
 
-const queryClient = new QueryClient();
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
 
 const renderSearchPage = (initialEntries: string[] = ['/']) => {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
-      <QueryClientProvider client={queryClient}>
-        {/* <FavoriteHeroProvider> */}
+      <QueryClientProvider client={createQueryClient()}>
         <SearchPage />
-        {/* </FavoriteHeroProvider> */}
       </QueryClientProvider>
     </MemoryRouter>,
   );
@@ -53,20 +63,17 @@ describe('SearchPage', () => {
     expect(mockedSearchHeroesAction).toHaveBeenCalledWith({
       name: undefined,
       strength: undefined,
+      team: undefined,
+      category: undefined,
+      universe: undefined,
+      status: undefined,
     });
-    // screen.debug();
   });
 
-  test('should render CustomJumbotron component with default values', () => {
+  test('should render SearchPage with default snapshot', () => {
     const { container } = renderSearchPage();
 
-    expect(mockedSearchHeroesAction).toHaveBeenCalledWith({
-      name: undefined,
-      strength: undefined,
-    });
-
     expect(container).toMatchSnapshot();
-    // screen.debug();
   });
 
   test('should call search action with name and strength from query params', () => {
@@ -75,8 +82,27 @@ describe('SearchPage', () => {
     expect(mockedSearchHeroesAction).toHaveBeenCalledWith({
       name: 'man',
       strength: '6',
+      team: undefined,
+      category: undefined,
+      universe: undefined,
+      status: undefined,
     });
     expect(container).toMatchSnapshot();
+  });
+
+  test('should call search action with advanced filter params', () => {
+    renderSearchPage([
+      '/search?name=man&team=Justice League&category=Hero&universe=DC&status=Active',
+    ]);
+
+    expect(mockedSearchHeroesAction).toHaveBeenCalledWith({
+      name: 'man',
+      strength: undefined,
+      team: 'Justice League',
+      category: 'Hero',
+      universe: 'DC',
+      status: 'Active',
+    });
   });
 
   test('should display HeroGrid with search results', async () => {
@@ -91,7 +117,6 @@ describe('SearchPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Clark Kent')).toBeDefined();
       expect(screen.getByText('Bruce Wayne')).toBeDefined();
-      screen.debug(screen.getByTestId('hero-grid'));
     });
   });
 });
