@@ -1,5 +1,5 @@
 import { use } from 'react';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,27 +15,31 @@ interface Props {
 }
 
 export const HeroGridCard = ({ hero }: Props) => {
-  const navigate = useNavigate();
-  const {isFavorite, toggleFavorite} = use(FavoriteHeroContext);
+  const { isFavorite, toggleFavorite } = use(FavoriteHeroContext);
 
-  const handleClick = () => {
-    navigate(`/heroes/${hero.slug}`);
-  };
+  const isActiveStatus = ['active', 'activo'].includes(
+    hero.status.toLowerCase(),
+  );
+
+  const heroUrl = `/heroes/${hero.slug}`;
 
   return (
     <Card className='group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50'>
       <div className='relative h-64'>
-        <img
-          src={hero.image}
-          alt={hero.name}
-          className='object-cover transition-all duration-500 group-hover:scale-110 absolute top-[-30px] w-full h-[410px]'
-          onClick={handleClick}
-        />
+        <Link to={heroUrl} aria-label={`View details for ${hero.alias}`}>
+          <img
+            src={hero.image}
+            alt={hero.alias}
+            loading='lazy'
+            className='object-cover transition-all duration-500 group-hover:scale-110 absolute top-[-30px] w-full h-[410px]'
+          />
+        </Link>
 
         {/* Status indicator */}
         <div className='absolute top-3 left-3 flex items-center gap-2'>
           <div
-            className={`w-3 h-3 rounded-full ${hero.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}
+            className={`w-3 h-3 rounded-full ${isActiveStatus ? 'bg-green-500' : 'bg-red-500'}`}
+            aria-hidden='true'
           />
           <Badge
             variant='secondary'
@@ -62,24 +66,36 @@ export const HeroGridCard = ({ hero }: Props) => {
           variant='ghost'
           className='absolute bottom-3 right-3 bg-white/90 hover:bg-white'
           onClick={() => toggleFavorite(hero)}
+          aria-label={
+            isFavorite(hero)
+              ? `Remove ${hero.alias} from favorites`
+              : `Add ${hero.alias} to favorites`
+          }
         >
-          <Heart className={`h-4 w-4 ${isFavorite(hero) ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />
+          <Heart
+            className={`h-4 w-4 ${isFavorite(hero) ? 'fill-red-500 text-red-500' : 'text-gray-500'}`}
+          />
         </Button>
 
         {/* View details button */}
         <Button
           size='sm'
           variant='ghost'
-          className='absolute bottom-3 left-3 bg-white/90 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity'
+          className='absolute bottom-3 left-3 bg-white/90 hover:bg-white md:opacity-0 md:group-hover:opacity-100 transition-opacity'
+          asChild
         >
-          <Eye className='h-4 w-4 text-gray-600' />
+          <Link to={heroUrl} aria-label={`View details for ${hero.alias}`}>
+            <Eye className='h-4 w-4 text-gray-600' />
+          </Link>
         </Button>
       </div>
 
       <CardHeader className='py-3 z-10 bg-gray-100/50 backdrop-blur-sm relative top-1 group-hover:top-[-10px] transition-all duration-300'>
         <div className='flex justify-between items-start'>
           <div className='space-y-1'>
-            <h3 className='font-bold text-lg leading-tight'>{hero.alias}</h3>
+            <Link to={heroUrl} className='hover:underline'>
+              <h3 className='font-bold text-lg leading-tight'>{hero.alias}</h3>
+            </Link>
             <p className='text-sm text-gray-600'>{hero.name}</p>
           </div>
           <Badge className='text-xs bg-green-100 text-green-800 border-green-200'>

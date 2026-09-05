@@ -1,14 +1,31 @@
+import { use } from 'react';
 import { Navigate, useParams } from 'react-router';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, Zap, Brain, Gauge, Users, Star, Award } from 'lucide-react';
+import {
+  Shield,
+  Zap,
+  Brain,
+  Gauge,
+  Users,
+  Star,
+  Award,
+  Heart,
+} from 'lucide-react';
 import { getHeroAction } from '@/heroes/actions/get-hero.action';
+import { FavoriteHeroContext } from '@/heroes/context/FavoriteHeroContext';
+import { CustomBreadcrumbs } from '@/components/custom/CustomBreadcrumbs';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { getCategoryColor, getStatusColor } from '@/heroes/constants/hero-colors';
+import { HeroPageSkeleton } from './HeroPageSkeleton';
 
 export const HeroPage = () => {
   const { idSlug = '' } = useParams();
+  const { isFavorite, toggleFavorite } = use(FavoriteHeroContext);
 
   const { data: superheroData, isError } = useQuery({
     queryKey: ['heroes', idSlug],
@@ -16,13 +33,17 @@ export const HeroPage = () => {
     retry: false,
   });
 
+  useDocumentTitle(superheroData?.alias ?? 'Hero');
+
   if (isError) {
     return <Navigate to='/' />;
   }
 
   if (!superheroData) {
-    return <div>Loading...</div>;
+    return <HeroPageSkeleton />;
   }
+
+  const isFavoriteHero = isFavorite(superheroData);
 
   const totalPower =
     superheroData.strength +
@@ -31,38 +52,43 @@ export const HeroPage = () => {
     superheroData.durability;
   const averagePower = Math.round((totalPower / 4) * 10);
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'activo':
-        return 'bg-green-500';
-      case 'inactivo':
-        return 'bg-gray-500';
-      case 'retirado':
-        return 'bg-blue-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'héroe':
-        return 'bg-blue-500';
-      case 'villano':
-        return 'bg-red-500';
-      case 'antihéroe':
-        return 'bg-purple-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+  const statCards = [
+    {
+      label: 'Strength',
+      value: superheroData.strength,
+      icon: Zap,
+      iconClass: 'bg-red-100 text-red-600',
+      valueClass: 'text-red-600',
+    },
+    {
+      label: 'Intelligence',
+      value: superheroData.intelligence,
+      icon: Brain,
+      iconClass: 'bg-purple-100 text-purple-600',
+      valueClass: 'text-purple-600',
+    },
+    {
+      label: 'Speed',
+      value: superheroData.speed,
+      icon: Gauge,
+      iconClass: 'bg-yellow-100 text-yellow-600',
+      valueClass: 'text-yellow-600',
+    },
+    {
+      label: 'Durability',
+      value: superheroData.durability,
+      icon: Shield,
+      iconClass: 'bg-green-100 text-green-600',
+      valueClass: 'text-green-600',
+    },
+  ];
 
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Header Banner */}
       <div className='bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white'>
-        <div className='max-w-7xl mx-auto px-6 py-12'>
-          <div className='flex flex-col md:flex-row items-center gap-8'>
+        <div className='mx-auto max-w-7xl px-6 py-12'>
+          <div className='flex flex-col items-center gap-8 md:flex-row'>
             <div className='relative'>
               <img
                 src={superheroData.image || '/placeholder.svg'}
@@ -71,15 +97,15 @@ export const HeroPage = () => {
                 height={200}
                 className='rounded-full border-4 border-white/20 shadow-2xl'
               />
-              <div className='absolute -top-2 -right-2'>
-                <div className='bg-yellow-400 text-black rounded-full p-2'>
-                  <Star className='w-6 h-6' />
+              <div className='absolute -right-2 -top-2'>
+                <div className='rounded-full bg-yellow-400 p-2 text-black'>
+                  <Star className='h-6 w-6' />
                 </div>
               </div>
             </div>
 
             <div className='flex-1 text-center md:text-left'>
-              <div className='flex flex-wrap gap-2 justify-center md:justify-start mb-4'>
+              <div className='mb-4 flex flex-wrap justify-center gap-2 md:justify-start'>
                 <Badge
                   className={`${getCategoryColor(superheroData.category)} text-white`}
                 >
@@ -92,217 +118,123 @@ export const HeroPage = () => {
                 </Badge>
                 <Badge
                   variant='secondary'
-                  className='bg-white/20 text-white border-white/30'
+                  className='border-white/30 bg-white/20 text-white'
                 >
                   {superheroData.universe}
                 </Badge>
               </div>
 
-              <h1 className='text-4xl md:text-6xl font-bold mb-2'>
+              <h1 className='mb-2 text-4xl font-bold md:text-6xl'>
                 {superheroData.alias}
               </h1>
-              <p className='text-xl text-blue-200 mb-4'>{superheroData.name}</p>
-              <p className='text-lg text-gray-300 max-w-2xl'>
+              <p className='mb-4 text-xl text-blue-200'>{superheroData.name}</p>
+              <p className='max-w-2xl text-lg text-gray-300'>
                 {superheroData.description}
               </p>
             </div>
 
-            <div className='text-center'>
-              <div className='bg-white/10 rounded-lg p-6 backdrop-blur-sm'>
+            <div className='space-y-3 text-center'>
+              <div className='rounded-lg bg-white/10 p-6 backdrop-blur-sm'>
                 <div className='text-3xl font-bold text-yellow-400'>
                   {averagePower}%
                 </div>
-                <div className='text-sm text-gray-300'>Nivel de Poder</div>
-                <div className='flex justify-center mt-2'>
+                <div className='text-sm text-gray-300'>Power Level</div>
+                <div className='mt-2 flex justify-center'>
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${i < Math.floor(averagePower / 20) ? 'text-yellow-400 fill-current' : 'text-gray-400'}`}
+                      className={`h-4 w-4 ${i < Math.floor(averagePower / 20) ? 'fill-current text-yellow-400' : 'text-gray-400'}`}
                     />
                   ))}
                 </div>
               </div>
+              <Button
+                variant={isFavoriteHero ? 'secondary' : 'outline'}
+                className='border-white/30 bg-white/10 text-white hover:bg-white/20'
+                onClick={() => toggleFavorite(superheroData)}
+                aria-pressed={isFavoriteHero}
+              >
+                <Heart
+                  className={`h-4 w-4 ${isFavoriteHero ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                />
+                {isFavoriteHero ? 'In Favorites' : 'Add to Favorites'}
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className='max-w-7xl mx-auto px-6 py-8'>
+      <div className='mx-auto max-w-7xl px-6 py-8'>
+        <CustomBreadcrumbs currentPage={superheroData.alias} />
+
         <Tabs defaultValue='stats' className='w-full'>
-          <TabsList className='grid w-full grid-cols-4 mb-8'>
+          <TabsList className='mb-8 grid w-full grid-cols-2 md:grid-cols-4'>
             <TabsTrigger value='stats' className='flex items-center gap-2'>
-              <Gauge className='w-4 h-4' />
-              Estadísticas
+              <Gauge className='h-4 w-4' />
+              Stats
             </TabsTrigger>
             <TabsTrigger value='powers' className='flex items-center gap-2'>
-              <Zap className='w-4 h-4' />
-              Poderes
+              <Zap className='h-4 w-4' />
+              Powers
             </TabsTrigger>
             <TabsTrigger value='team' className='flex items-center gap-2'>
-              <Users className='w-4 h-4' />
-              Equipo
+              <Users className='h-4 w-4' />
+              Team
             </TabsTrigger>
             <TabsTrigger value='info' className='flex items-center gap-2'>
-              <Award className='w-4 h-4' />
-              Información
+              <Award className='h-4 w-4' />
+              Info
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value='stats' className='space-y-6'>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-              {/* Strength */}
-              <Card className='text-center'>
-                <CardContent className='pt-6'>
-                  <div className='flex justify-center mb-4'>
-                    <div className='bg-red-100 p-3 rounded-full'>
-                      <Zap className='w-8 h-8 text-red-600' />
-                    </div>
-                  </div>
-                  <h3 className='font-semibold text-lg mb-2'>Fuerza</h3>
-                  <div className='text-3xl font-bold text-red-600 mb-2'>
-                    {superheroData.strength}
-                  </div>
-                  <Progress
-                    value={superheroData.strength * 10}
-                    className='h-2'
-                  />
-                </CardContent>
-              </Card>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
+              {statCards.map((stat) => {
+                const Icon = stat.icon;
 
-              {/* Intelligence */}
-              <Card className='text-center'>
-                <CardContent className='pt-6'>
-                  <div className='flex justify-center mb-4'>
-                    <div className='bg-purple-100 p-3 rounded-full'>
-                      <Brain className='w-8 h-8 text-purple-600' />
-                    </div>
-                  </div>
-                  <h3 className='font-semibold text-lg mb-2'>Inteligencia</h3>
-                  <div className='text-3xl font-bold text-purple-600 mb-2'>
-                    {superheroData.intelligence}
-                  </div>
-                  <Progress
-                    value={superheroData.intelligence * 10}
-                    className='h-2'
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Speed */}
-              <Card className='text-center'>
-                <CardContent className='pt-6'>
-                  <div className='flex justify-center mb-4'>
-                    <div className='bg-yellow-100 p-3 rounded-full'>
-                      <Gauge className='w-8 h-8 text-yellow-600' />
-                    </div>
-                  </div>
-                  <h3 className='font-semibold text-lg mb-2'>Velocidad</h3>
-                  <div className='text-3xl font-bold text-yellow-600 mb-2'>
-                    {superheroData.speed}
-                  </div>
-                  <Progress value={superheroData.speed * 10} className='h-2' />
-                </CardContent>
-              </Card>
-
-              {/* Durability */}
-              <Card className='text-center'>
-                <CardContent className='pt-6'>
-                  <div className='flex justify-center mb-4'>
-                    <div className='bg-green-100 p-3 rounded-full'>
-                      <Shield className='w-8 h-8 text-green-600' />
-                    </div>
-                  </div>
-                  <h3 className='font-semibold text-lg mb-2'>Resistencia</h3>
-                  <div className='text-3xl font-bold text-green-600 mb-2'>
-                    {superheroData.durability}
-                  </div>
-                  <Progress
-                    value={superheroData.durability * 10}
-                    className='h-2'
-                  />
-                </CardContent>
-              </Card>
+                return (
+                  <Card key={stat.label} className='text-center'>
+                    <CardContent className='pt-6'>
+                      <div className='mb-4 flex justify-center'>
+                        <div className={`rounded-full p-3 ${stat.iconClass}`}>
+                          <Icon className='h-8 w-8' />
+                        </div>
+                      </div>
+                      <h3 className='mb-2 text-lg font-semibold'>
+                        {stat.label}
+                      </h3>
+                      <div
+                        className={`mb-2 text-3xl font-bold ${stat.valueClass}`}
+                      >
+                        {stat.value}
+                      </div>
+                      <Progress value={stat.value * 10} className='h-2' />
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-
-            {/* Power Comparison Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Comparación de Habilidades</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-4'>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-24 text-sm font-medium'>Fuerza</div>
-                    <div className='flex-1'>
-                      <Progress
-                        value={superheroData.strength * 10}
-                        className='h-4'
-                      />
-                    </div>
-                    <div className='w-12 text-right font-bold'>
-                      {superheroData.strength}/10
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-24 text-sm font-medium'>Inteligencia</div>
-                    <div className='flex-1'>
-                      <Progress
-                        value={superheroData.intelligence * 10}
-                        className='h-4'
-                      />
-                    </div>
-                    <div className='w-12 text-right font-bold'>
-                      {superheroData.intelligence}/10
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-24 text-sm font-medium'>Velocidad</div>
-                    <div className='flex-1'>
-                      <Progress
-                        value={superheroData.speed * 10}
-                        className='h-4'
-                      />
-                    </div>
-                    <div className='w-12 text-right font-bold'>
-                      {superheroData.speed}/10
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-24 text-sm font-medium'>Resistencia</div>
-                    <div className='flex-1'>
-                      <Progress
-                        value={superheroData.durability * 10}
-                        className='h-4'
-                      />
-                    </div>
-                    <div className='w-12 text-right font-bold'>
-                      {superheroData.durability}/10
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value='powers'>
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
-                  <Zap className='w-6 h-6 text-yellow-500' />
-                  Superpoderes
+                  <Zap className='h-6 w-6 text-yellow-500' />
+                  Superpowers
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
                   {superheroData.powers.map((power, index) => (
                     <div
-                      key={index}
-                      className='bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200'
+                      key={`${power}-${index}`}
+                      className='rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4'
                     >
                       <div className='flex items-center gap-3'>
-                        <div className='bg-blue-500 p-2 rounded-full'>
-                          <Zap className='w-4 h-4 text-white' />
+                        <div className='rounded-full bg-blue-500 p-2'>
+                          <Zap className='h-4 w-4 text-white' />
                         </div>
                         <span className='font-medium text-blue-900'>
                           {power}
@@ -319,43 +251,47 @@ export const HeroPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
-                  <Users className='w-6 h-6 text-green-500' />
-                  Afiliación de Equipo
+                  <Users className='h-6 w-6 text-green-500' />
+                  Team Affiliation
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='text-center py-8'>
-                  <div className='bg-green-100 p-6 rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center'>
-                    <Users className='w-12 h-12 text-green-600' />
+                <div className='py-8 text-center'>
+                  <div className='mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-green-100 p-6'>
+                    <Users className='h-12 w-12 text-green-600' />
                   </div>
-                  <h3 className='text-2xl font-bold text-green-700 mb-2'>
+                  <h3 className='mb-2 text-2xl font-bold text-green-700'>
                     {superheroData.team}
                   </h3>
-                  <p className='text-gray-600'>
-                    Miembro activo del equipo de superhéroes más poderoso
-                  </p>
+                  <Badge
+                    className={`${getCategoryColor(superheroData.category)} text-white`}
+                  >
+                    {superheroData.category}
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value='info'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <Card>
                 <CardHeader>
-                  <CardTitle>Detalles Personales</CardTitle>
+                  <CardTitle>Personal Details</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-4'>
-                  <div className='flex justify-between items-center py-2 border-b'>
-                    <span className='text-gray-600'>Nombre Real:</span>
+                  <div className='flex justify-between items-center border-b py-2'>
+                    <span className='text-gray-600'>Real Name:</span>
                     <span className='font-semibold'>{superheroData.name}</span>
                   </div>
-                  <div className='flex justify-between items-center py-2 border-b'>
+                  <div className='flex justify-between items-center border-b py-2'>
                     <span className='text-gray-600'>Alias:</span>
-                    <span className='font-semibold'>{superheroData.alias}</span>
+                    <span className='font-semibold'>
+                      {superheroData.alias}
+                    </span>
                   </div>
-                  <div className='flex justify-between items-center py-2 border-b'>
-                    <span className='text-gray-600'>Categoría:</span>
+                  <div className='flex justify-between items-center border-b py-2'>
+                    <span className='text-gray-600'>Category:</span>
                     <Badge
                       className={`${getCategoryColor(superheroData.category)} text-white`}
                     >
@@ -363,7 +299,7 @@ export const HeroPage = () => {
                     </Badge>
                   </div>
                   <div className='flex justify-between items-center py-2'>
-                    <span className='text-gray-600'>Estado:</span>
+                    <span className='text-gray-600'>Status:</span>
                     <Badge
                       className={`${getStatusColor(superheroData.status)} text-white`}
                     >
@@ -375,27 +311,33 @@ export const HeroPage = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Información del Universo</CardTitle>
+                  <CardTitle>Universe Information</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-4'>
-                  <div className='flex justify-between items-center py-2 border-b'>
-                    <span className='text-gray-600'>Universo:</span>
+                  <div className='flex justify-between items-center border-b py-2'>
+                    <span className='text-gray-600'>Universe:</span>
                     <span className='font-semibold'>
                       {superheroData.universe}
                     </span>
                   </div>
-                  <div className='flex justify-between items-center py-2 border-b'>
-                    <span className='text-gray-600'>Primera Aparición:</span>
+                  <div className='flex justify-between items-center border-b py-2'>
+                    <span className='text-gray-600'>First Appearance:</span>
                     <span className='font-semibold'>
                       {superheroData.firstAppearance}
                     </span>
                   </div>
-                  <div className='flex justify-between items-center py-2'>
-                    <span className='text-gray-600'>Años Activo:</span>
+                  <div className='flex justify-between items-center border-b py-2'>
+                    <span className='text-gray-600'>Years Active:</span>
                     <span className='font-semibold'>
                       {new Date().getFullYear() -
                         Number.parseInt(superheroData.firstAppearance)}{' '}
-                      años
+                      years
+                    </span>
+                  </div>
+                  <div className='flex justify-between items-center py-2'>
+                    <span className='text-gray-600'>Team:</span>
+                    <span className='font-semibold'>
+                      {superheroData.team}
                     </span>
                   </div>
                 </CardContent>

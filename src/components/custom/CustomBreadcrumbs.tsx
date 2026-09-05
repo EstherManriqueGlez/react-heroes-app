@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { SlashIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import {
@@ -29,16 +30,16 @@ export const CustomBreadcrumbs = ({ currentPage, breadcrumbs = [] }: Props) => {
         </BreadcrumbItem>
 
         {breadcrumbs.map((breadcrumbsItem) => (
-          <div>
+          <Fragment key={breadcrumbsItem.to}>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbSeparator>
-                <SlashIcon />
-              </BreadcrumbSeparator>
               <BreadcrumbLink asChild>
                 <Link to={breadcrumbsItem.to}>{breadcrumbsItem.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-          </div>
+          </Fragment>
         ))}
 
         <BreadcrumbSeparator>
