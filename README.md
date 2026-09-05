@@ -64,6 +64,18 @@ A Single Page Application to discover, explore, and manage a catalog of superher
 | `npm run test:ui` | Run tests in the Vitest UI                                        |
 | `npm run coverage`| Run tests with coverage report                                    |
 
+## Deployment
+
+The frontend is continuously deployed to **Netlify** from the `main` branch (build command `npm run build`, publish directory `dist`). The backend API runs on **Render**.
+
+Netlify build-time environment variable:
+
+| Variable       | Description                 | Example                              |
+|----------------|-----------------------------|--------------------------------------|
+| `VITE_API_URL` | Base URL of the hero API (Render) | `https://your-backend.onrender.com`   |
+
+The app uses a hash router, so no server-side redirects or rewrites are required.
+
 ## Project Structure
 
 ```
