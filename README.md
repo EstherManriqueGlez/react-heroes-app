@@ -57,7 +57,8 @@ A Single Page Application to discover, explore, and manage a catalog of superher
 | Script            | Description                                                       |
 |-------------------|-------------------------------------------------------------------|
 | `npm run dev`     | Start the Vite development server                                 |
-| `npm run build`   | Test (`vitest run`), type-check (`tsc -b`), then build (`vite build`) |
+| `npm run build`   | Type-check (`tsc -b`) and build (`vite build`)                    |
+| `npm run typecheck` | Type-check the project with `tsc -b`                              |
 | `npm run preview` | Preview the production build locally                              |
 | `npm run lint`    | Run ESLint over the project                                       |
 | `npm test`        | Run the test suite in watch mode                                  |
@@ -105,4 +106,4 @@ src/
 
 ## Notes
 
-It was created for learning purposes following the [Udemy](https://www.udemy.com).
+This project was created for learning purposes, following a Udemy course on React development to put React, TypeScript, and modern frontend tooling into practice.
