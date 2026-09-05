@@ -1,14 +1,18 @@
+import { use } from 'react';
 import { Navigate, useParams } from 'react-router';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { Shield, Zap, Brain, Gauge, Users, Star, Award } from 'lucide-react';
+import { Shield, Zap, Brain, Gauge, Users, Star, Award, Heart } from 'lucide-react';
 import { getHeroAction } from '@/heroes/actions/get-hero.action';
+import { FavoriteHeroContext } from '@/heroes/context/FavoriteHeroContext';
 
 export const HeroPage = () => {
   const { idSlug = '' } = useParams();
+  const { isFavorite, toggleFavorite } = use(FavoriteHeroContext);
 
   const { data: superheroData, isError } = useQuery({
     queryKey: ['heroes', idSlug],
@@ -23,6 +27,8 @@ export const HeroPage = () => {
   if (!superheroData) {
     return <div>Loading...</div>;
   }
+
+  const isFavoriteHero = isFavorite(superheroData);
 
   const totalPower =
     superheroData.strength +
@@ -107,12 +113,12 @@ export const HeroPage = () => {
               </p>
             </div>
 
-            <div className='text-center'>
+            <div className='text-center space-y-3'>
               <div className='bg-white/10 rounded-lg p-6 backdrop-blur-sm'>
                 <div className='text-3xl font-bold text-yellow-400'>
                   {averagePower}%
                 </div>
-                <div className='text-sm text-gray-300'>Nivel de Poder</div>
+                <div className='text-sm text-gray-300'>Power Level</div>
                 <div className='flex justify-center mt-2'>
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -122,6 +128,17 @@ export const HeroPage = () => {
                   ))}
                 </div>
               </div>
+              <Button
+                variant={isFavoriteHero ? 'secondary' : 'outline'}
+                className='bg-white/10 border-white/30 text-white hover:bg-white/20'
+                onClick={() => toggleFavorite(superheroData)}
+                aria-pressed={isFavoriteHero}
+              >
+                <Heart
+                  className={`h-4 w-4 ${isFavoriteHero ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                />
+                {isFavoriteHero ? 'In Favorites' : 'Add to Favorites'}
+              </Button>
             </div>
           </div>
         </div>

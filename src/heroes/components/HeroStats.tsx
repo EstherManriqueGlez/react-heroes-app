@@ -11,7 +11,7 @@ export const HeroStats = () => {
   const { data: summary } = useHeroSummary();
   const { favoriteCount } = use(FavoriteHeroContext);
 
-  const percentOfFavorites = summary
+  const percentOfFavorites = summary?.totalHeroes
     ? ((favoriteCount / summary.totalHeroes) * 100).toFixed(2)
     : '0';
 
