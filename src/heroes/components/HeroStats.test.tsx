@@ -125,7 +125,7 @@ describe('HeroStats', () => {
   test('should render component with default values', () => {
     const { container } = renderHeroStats();
 
-    expect(screen.getByText('Loading...')).toBeDefined();
+    expect(container.querySelector('.animate-pulse')).not.toBeNull();
     expect(container).toMatchSnapshot();
   });
 

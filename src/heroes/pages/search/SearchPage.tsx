@@ -8,13 +8,17 @@ import { EmptyState } from '@/components/custom/EmptyState';
 import { SearchX, Sparkles } from 'lucide-react';
 import { HeroStats } from '@/heroes/components/HeroStats';
 import { HeroGrid } from '@/heroes/components/HeroGrid';
+import { HeroGridSkeleton } from '@/heroes/components/HeroGridSkeleton';
 import { SearchControls } from './ui/SearchControls';
 import { searchHeroesAction } from '@/heroes/actions/search-heroes.actions';
 import { useHeroCatalog } from '@/heroes/hooks/useHeroCatalog';
 import { useHeroSummary } from '@/heroes/hooks/useHeroSummary';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 export const SearchPage = () => {
   const [searchParams] = useSearchParams();
+
+  useDocumentTitle('Search');
 
   const name = searchParams.get('name') ?? undefined;
   const strength = searchParams.get('strength') ?? undefined;
@@ -23,7 +27,7 @@ export const SearchPage = () => {
   const universe = searchParams.get('universe') ?? undefined;
   const status = searchParams.get('status') ?? undefined;
   const sort = searchParams.get('sort') ?? '';
-  const view = searchParams.get('view') ?? 'grid';
+  const view = (searchParams.get('view') ?? 'grid') as 'grid' | 'list';
 
   const { data: summary } = useHeroSummary();
   const { data: catalogData = { heroes: [] } } = useHeroCatalog(
@@ -86,7 +90,9 @@ export const SearchPage = () => {
       )}
 
       {/* Search Results */}
-      {sortedHeroes.length > 0 ? (
+      {hasActiveFilters && isFetching && sortedHeroes.length === 0 ? (
+        <HeroGridSkeleton />
+      ) : sortedHeroes.length > 0 ? (
         <HeroGrid heroes={sortedHeroes} layout={view} />
       ) : (
         <EmptyState

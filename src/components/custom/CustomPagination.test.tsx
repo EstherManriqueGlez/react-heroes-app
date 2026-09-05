@@ -20,21 +20,12 @@ const renderWithRouter = (
 };
 
 describe('CustomPagination', () => {
-  test('should render component correctly with default values ', () => {
+  test('should render all page numbers when totalPages is small', () => {
     renderWithRouter(<CustomPagination totalPages={5} />);
-
-    // screen.debug();
 
     expect(screen.getByText('Previous')).toBeDefined();
     expect(screen.getByText('Next')).toBeDefined();
 
-    // expect(screen.getByText('1')).toBeDefined();
-    // expect(screen.getByText('2')).toBeDefined();
-    // expect(screen.getByText('3')).toBeDefined();
-    // expect(screen.getByText('4')).toBeDefined();
-    // expect(screen.getByText('5')).toBeDefined();
-
-    // It's better this way to avoid repeating code
     for (let i = 1; i <= 5; i++) {
       expect(screen.getByText(i.toString())).toBeDefined();
     }
@@ -42,29 +33,22 @@ describe('CustomPagination', () => {
 
   test('should disable Previous button on first page', () => {
     renderWithRouter(<CustomPagination totalPages={5} />);
-    const previousButton = screen.getByText('Previous');
-
-    // screen.debug(previousButton);
+    const previousButton = screen.getByRole('button', { name: 'Previous page' });
 
     expect(previousButton.getAttributeNames()).toContain('disabled');
   });
 
   test('should disable Next button on last page', () => {
     renderWithRouter(<CustomPagination totalPages={5} />, ['/?page=5']);
-    const nextButton = screen.getByText('Next');
-    
-    // screen.debug(nextButton);
+    const nextButton = screen.getByRole('button', { name: 'Next page' });
 
     expect(nextButton.getAttributeNames()).toContain('disabled');
   });
 
-   test('should define the variant attribute correctly when we are in page 3', () => {
+  test('should define the variant attribute correctly when we are in page 3', () => {
     renderWithRouter(<CustomPagination totalPages={5} />, ['/?page=3']);
     const button2 = screen.getByText('2');
     const button3 = screen.getByText('3');
-    
-    // screen.debug(button2);
-    // screen.debug(button3);
 
     expect(button2.getAttribute('variant')).toContain('outline');
     expect(button3.getAttribute('variant')).toContain('default');
@@ -78,12 +62,38 @@ describe('CustomPagination', () => {
     expect(button2.getAttribute('variant')).toContain('outline');
     expect(button3.getAttribute('variant')).toContain('default');
 
-    // screen.debug(button3);
-
     fireEvent.click(button2);
     expect(button2.getAttribute('variant')).toContain('default');
     expect(button3.getAttribute('variant')).toContain('outline');
-    // screen.debug(button3);
+  });
 
+  test('should render ellipsis and window for large ranges', () => {
+    renderWithRouter(<CustomPagination totalPages={10} />, ['/?page=5']);
+
+    expect(screen.getByText('1')).toBeDefined();
+    expect(screen.getByText('4')).toBeDefined();
+    expect(screen.getByText('5')).toBeDefined();
+    expect(screen.getByText('6')).toBeDefined();
+    expect(screen.getByText('10')).toBeDefined();
+
+    expect(screen.getAllByText('…')).toHaveLength(2);
+  });
+
+  test('should not render ellipsis on edges of a large range', () => {
+    renderWithRouter(<CustomPagination totalPages={10} />, ['/?page=1']);
+
+    expect(screen.getByText('1')).toBeDefined();
+    expect(screen.getByText('2')).toBeDefined();
+    expect(screen.getByText('10')).toBeDefined();
+    expect(screen.getAllByText('…')).toHaveLength(1);
+  });
+
+  test('should show the showing range text when totalItems is provided', () => {
+    renderWithRouter(
+      <CustomPagination totalPages={5} totalItems={30} pageSize={6} />,
+      ['/?page=2'],
+    );
+
+    expect(screen.getByText('Showing 7-12 of 30')).toBeDefined();
   });
 });

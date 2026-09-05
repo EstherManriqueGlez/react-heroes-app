@@ -3,6 +3,7 @@ import { Heart, Trophy, Users, Zap } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { HeroStatCard } from './HeroStatCard';
+import { HeroStatsSkeleton } from './HeroStatsSkeleton';
 
 import { useHeroSummary } from '../hooks/useHeroSummary';
 import { FavoriteHeroContext } from '../context/FavoriteHeroContext';
@@ -16,7 +17,7 @@ export const HeroStats = () => {
     : '0';
 
   if (!summary) {
-    return <div>Loading...</div>;
+    return <HeroStatsSkeleton />;
   }
 
   return (
@@ -26,7 +27,7 @@ export const HeroStats = () => {
         icon={<Users className="h-4 w-4 text-muted-foreground" />}
       >
         <div className="text-2xl font-bold">{summary?.totalHeroes}</div>
-        <div className="flex gap-1 mt-2">
+        <div className="flex flex-wrap gap-1 mt-2">
           <Badge variant="secondary" className="text-xs">
             {summary?.heroCount} Heroes
           </Badge>

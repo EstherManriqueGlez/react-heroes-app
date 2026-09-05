@@ -2,21 +2,26 @@ import { use, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CustomJumbotron } from '@/components/custom/CustomJumbotron';
 import { EmptyState } from '@/components/custom/EmptyState';
 import { Heart } from 'lucide-react';
 import { HeroStats } from '@/heroes/components/HeroStats';
 import { HeroGrid } from '@/heroes/components/HeroGrid';
+import { HeroGridSkeleton } from '@/heroes/components/HeroGridSkeleton';
 import { CustomPagination } from '@/components/custom/CustomPagination';
 import { CustomBreadcrumbs } from '@/components/custom/CustomBreadcrumbs';
 import { useHeroSummary } from '@/heroes/hooks/useHeroSummary';
 import { useHeroPagination } from '@/heroes/hooks/useHeroPagination';
 import { FavoriteHeroContext } from '@/heroes/context/FavoriteHeroContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 export const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { favoriteCount, favorites } = use(FavoriteHeroContext);
+
+  useDocumentTitle('Home');
 
   const activeTab = searchParams.get('tab') ?? 'all';
   const page = searchParams.get('page') ?? '1';
@@ -32,12 +37,33 @@ export const HomePage = () => {
   const { data: heroesResponse } = useHeroPagination(+page, +limit, category);
   const { data: summary } = useHeroSummary();
 
+  const isLoadingHeroes = selectedTab !== 'favorites' && !heroesResponse;
+
+  const renderCharacterList = () => {
+    if (isLoadingHeroes) {
+      return <HeroGridSkeleton />;
+    }
+
+    const heroes = heroesResponse?.heroes ?? [];
+
+    if (heroes.length === 0) {
+      return (
+        <EmptyState
+          title="No characters found"
+          description="There are no characters available for this filter."
+        />
+      );
+    }
+
+    return <HeroGrid heroes={heroes} />;
+  };
+
   return (
     <div data-testid="home-page">
       {/* Header */}
       <CustomJumbotron
         title="Superhero Universe"
-        description="Discover, explore, and manage your favorite superheroes and villains"
+        description="Discover, explore, and manage your favorite heroes and villains"
       />
 
       <CustomBreadcrumbs currentPage="Home" />
@@ -47,7 +73,7 @@ export const HomePage = () => {
 
       {/* Tabs */}
       <Tabs value={selectedTab} className="mb-8">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
           <TabsTrigger
             value="all"
             onClick={() =>
@@ -101,16 +127,7 @@ export const HomePage = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all">
-          {heroesResponse?.heroes?.length ? (
-            <HeroGrid heroes={heroesResponse.heroes} />
-          ) : (
-            <EmptyState
-              title="No characters found"
-              description="There are no characters available for this filter. Try a different category."
-            />
-          )}
-        </TabsContent>
+        <TabsContent value="all">{renderCharacterList()}</TabsContent>
 
         <TabsContent value="favorites">
           {favorites.length === 0 ? (
@@ -124,33 +141,27 @@ export const HomePage = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="heroes">
-          {heroesResponse?.heroes?.length ? (
-            <HeroGrid heroes={heroesResponse.heroes} />
-          ) : (
-            <EmptyState
-              title="No heroes found"
-              description="There are no heroes available for this filter."
-            />
-          )}
-        </TabsContent>
+        <TabsContent value="heroes">{renderCharacterList()}</TabsContent>
 
-        <TabsContent value="villains">
-          {heroesResponse?.heroes?.length ? (
-            <HeroGrid heroes={heroesResponse.heroes} />
-          ) : (
-            <EmptyState
-              title="No villains found"
-              description="There are no villains available for this filter."
-            />
-          )}
-        </TabsContent>
+        <TabsContent value="villains">{renderCharacterList()}</TabsContent>
       </Tabs>
 
       {/* Pagination */}
-      {selectedTab !== 'favorites' && (
-        <CustomPagination totalPages={heroesResponse?.pages ?? 1} />
-      )}
+      {selectedTab !== 'favorites' &&
+        (isLoadingHeroes ? (
+          <div className="mb-8 flex items-center justify-center gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        ) : (
+          <CustomPagination
+            totalPages={heroesResponse?.pages ?? 1}
+            totalItems={heroesResponse?.total}
+            pageSize={+limit}
+          />
+        ))}
     </div>
   );
 };

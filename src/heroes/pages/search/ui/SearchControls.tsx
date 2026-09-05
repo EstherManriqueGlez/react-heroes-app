@@ -134,7 +134,7 @@ export const SearchControls = ({ heroes = [] }: Props) => {
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5' />
           <Input
             ref={inputRef}
-            type='search'
+            type='text'
             placeholder='Search heroes, villains, powers, teams...'
             className='pl-12 h-12 text-lg bg-white pr-10'
             value={nameInput}
@@ -148,7 +148,7 @@ export const SearchControls = ({ heroes = [] }: Props) => {
               onClick={handleClearName}
               className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
             >
-              <X className='h-5 w-5' />
+              <X className='h-5 w-5 cursor-pointer' />
             </button>
           )}
         </div>
